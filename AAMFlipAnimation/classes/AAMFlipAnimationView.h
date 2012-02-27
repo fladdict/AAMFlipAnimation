@@ -46,10 +46,8 @@
 @property (assign,nonatomic) BOOL hideAfterAnimation;   //hides this view after animation.
 @property (assign,nonatomic) BOOL removeAfterAnimation; //removes this view after animation.
 
--(void)animate;
--(void)animateWithFirstImage:(UIImage*)theImage0 secondImage:(UIImage*)theImage;
--(void)animateWithNextImage:(UIImage*)theNextImage; //continue with using last secondImage
--(void)updateFirstImage:(UIImage*)theImage;
--(void)updateSecondImage:(UIImage*)theImage;
+
+
+-(void)setImage:(UIImage*)theImage animated:(BOOL)theBool;
 
 @end

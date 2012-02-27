@@ -12,8 +12,13 @@
 @interface AAMFlipAnimationView(private)
 
 - (void)setup;
+- (void)animate;
+- (void)updateFirstImage:(UIImage*)theImage;
+- (void)updateSecondImage:(UIImage*)theImage;
 - (void)animateFirstHalf;
 - (void)animateLastHalf;
+- (void)resetAllAnimations;
+- (CALayer*)maskLayerWithImage:(UIImage*)theImage;
 @end
 
 
@@ -118,7 +123,71 @@
     [CATransaction commit];
 }
 
+#pragma mark - public
+
+-(void)setImage:(UIImage*)theImage animated:(BOOL)theBool
+{
+    //Reset all animations
+    [self resetAllAnimations];
+    
+    //はじめてか否か？
+    if(!secondTopImage){
+    }else{
+        firstTopImage = secondTopImage;
+        firstBottomImage = secondBottomImage;
+    }
+    [self updateSecondImage:theImage];
+    
+    if(theBool&&firstTopImage){
+        [self animate];
+    }else{
+        //Just update visible image;
+        [self updateFirstImage:theImage];
+        firstTopLayer.hidden = YES;
+        firstBottomLayer.hidden = YES;
+        secondTopLayer.contents = (id)(secondTopImage.CGImage);
+        secondBottomLayer.contents = (id)(secondBottomImage.CGImage);
+    }
+}
+
+
+
+
 #pragma mark - internal
+
+-(void)resetAllAnimations
+{
+    [firstTopLayer removeAllAnimations];
+    [firstBottomLayer removeAllAnimations];
+    [secondTopLayer removeAllAnimations];
+    [secondBottomLayer removeAllAnimations];
+    [shadowTopLayer removeAllAnimations];
+    [shadowBottomLayer removeAllAnimations];
+    [highlightTopLayer removeAllAnimations];
+    [highlightBottomLayer removeAllAnimations];
+    
+    [CATransaction begin];
+    [CATransaction setValue:(id)kCFBooleanTrue
+                     forKey:kCATransactionDisableActions];
+    
+    firstTopLayer.transform = CATransform3DIdentity;
+    firstBottomLayer.transform = CATransform3DIdentity;
+    secondTopLayer.transform = CATransform3DIdentity;
+    secondBottomLayer.transform = CATransform3DIdentity;
+    
+    firstTopLayer.hidden = NO;
+    firstBottomLayer.hidden = NO;
+    secondTopLayer.hidden = NO;
+    secondBottomLayer.hidden = NO;
+    
+    shadowTopLayer.opacity = 0.0f;
+    shadowBottomLayer.opacity = 0.0f;
+    highlightTopLayer.opacity = 0.0f;
+    highlightBottomLayer.opacity = 0.0f;
+    
+    [CATransaction commit];
+}
+
 
 -(CALayer*)maskLayerWithImage:(UIImage*)theImage
 {
@@ -127,6 +196,7 @@
     mask.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height*0.5f);
     return mask;
 }
+
 
 - (CATransform3D)transformWithRotation:(float)theValue
 {
@@ -137,23 +207,6 @@
 
 #pragma mark-
 
--(void)animateWithFirstImage:(UIImage*)theImage0 secondImage:(UIImage*)theImage1
-{
-    [self updateFirstImage:theImage0];
-    [self updateSecondImage:theImage1];
-    [self animate];
-}
-
--(void)animateWithNextImage:(UIImage*)theNextImage
-{
-    
-    if(secondTopImage){
-        firstTopImage = secondTopImage;
-        firstBottomImage =  secondBottomImage;
-    }
-    [self updateSecondImage:theNextImage];
-    [self animate];
-}
 
 -(void)updateFirstImage:(UIImage*)theImage
 {
@@ -163,6 +216,7 @@
     CGContextRef ctx;
     CGSize s = CGSizeMake(w, h);
     
+    @autoreleasepool {
     //Draw first top
     UIGraphicsBeginImageContext(s);
     ctx = UIGraphicsGetCurrentContext();
@@ -176,6 +230,7 @@
     firstBottomImage = UIGraphicsGetImageFromCurrentImageContext();
     CGContextRestoreGState(ctx);
     UIGraphicsEndImageContext();
+    }
 }
 
 -(void)updateSecondImage:(UIImage*)theImage
@@ -186,6 +241,7 @@
     CGContextRef ctx;
     CGSize s = CGSizeMake(w, h);
     
+    @autoreleasepool {
     //Draw second top
     UIGraphicsBeginImageContext(s);
     ctx = UIGraphicsGetCurrentContext();
@@ -199,6 +255,7 @@
     secondBottomImage = UIGraphicsGetImageFromCurrentImageContext();
     CGContextRestoreGState(ctx);
     UIGraphicsEndImageContext();
+    }
 }
 
 -(void)animateWithFirstView:(UIView*)theView0 lastView:(UIView*)theView1
@@ -207,12 +264,7 @@
 }
 
 -(void)animate
-{
-    [firstTopLayer removeAllAnimations];
-    [firstBottomLayer removeAllAnimations];
-    [secondTopLayer removeAllAnimations];
-    [secondBottomLayer removeAllAnimations];
-    
+{  
     [CATransaction begin];
     [CATransaction setValue:(id)kCFBooleanTrue
                      forKey:kCATransactionDisableActions];
@@ -255,13 +307,9 @@
     isFirstHalfAnimation = YES;
     self.hidden = NO;
     
-    
     [CATransaction begin];
     [CATransaction setValue:(id)kCFBooleanTrue
                      forKey:kCATransactionDisableActions];
-        firstTopLayer.hidden = NO;
-        firstBottomLayer.hidden = NO;
-        secondTopLayer.hidden = NO;
         secondBottomLayer.hidden = YES;
         highlightTopLayer.opacity = 0.5f;
     [CATransaction commit];

@@ -33,10 +33,10 @@
 -(void)doNextAnim:(AAMFlipAnimationView*)theView
 {
     if(theView==flip0){
-        [theView animateWithNextImage:[self flipImageWithString:[NSString stringWithFormat:@"%.3d",(int)rand()%500]]];
+        [theView setImage: [self flipImageWithString:[NSString stringWithFormat:@"%.3d",(int)rand()%500]] animated:YES];
     }else{
         NSArray *ar = [NSArray arrayWithObjects:@"quadcamera",@"superalbum",@"superpopcam",@"tiltshift-generator",@"toycamera", nil];
-        [theView animateWithNextImage:[UIImage imageNamed:[ar objectAtIndex:rand()%[ar count]]]];
+        [theView setImage:[UIImage imageNamed:[ar objectAtIndex:rand()%[ar count]]] animated:YES];
     }
 }
 
@@ -56,7 +56,7 @@
     flip0.delegate = self;
     flip0.hideAfterAnimation = NO;
     [self.view addSubview:flip0];
-    [flip0 updateFirstImage:[self flipImageWithString:@"START"]];
+    [flip0 setImage: [self flipImageWithString:@"START"] animated:YES];
     [self doNextAnim:flip0];
     
     /*
@@ -64,27 +64,27 @@
      */
     
     flip1 = [[AAMFlipAnimationView alloc]initWithFrame:CGRectMake(25, 152, 75, 75)];
-    flip1.duration = 1;
+    flip1.duration = 2.f;
     flip1.delegate = self;
     flip1.hideAfterAnimation = NO;
     [self.view addSubview:flip1];
-    [flip1 updateFirstImage:[UIImage imageNamed:@"tiltshift-generator"]];
+    [flip1 setImage:[UIImage imageNamed:@"tiltshift-generator"] animated:NO];
     [self doNextAnim:flip1];
     
     flip2 = [[AAMFlipAnimationView alloc]initWithFrame:CGRectMake(25, 252, 75, 75)];
-    flip2.duration = 1;
+    flip2.duration = 2.f;
     flip2.delegate = self;
     flip2.hideAfterAnimation = NO;
     [self.view addSubview:flip2];
-    [flip2 updateFirstImage:[UIImage imageNamed:@"tiltshift-generator"]];
+    [flip2 setImage:[UIImage imageNamed:@"tiltshift-generator"] animated:NO];
     [self performSelector:@selector(doNextAnim:) withObject:flip2 afterDelay:0.5f];
     
     flip3 = [[AAMFlipAnimationView alloc]initWithFrame:CGRectMake(25, 352, 75, 75)];
-    flip3.duration = 1;
+    flip3.duration = 2.f;
     flip3.delegate = self;
     flip3.hideAfterAnimation = NO;
     [self.view addSubview:flip3];
-    [flip3 updateFirstImage:[UIImage imageNamed:@"tiltshift-generator"]];
+    [flip3 setImage:[UIImage imageNamed:@"tiltshift-generator"] animated:NO];
     [self performSelector:@selector(doNextAnim:) withObject:flip3 afterDelay:1.0f];
 }
 
